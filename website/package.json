@@ -28,7 +28,7 @@
     "@pollyjs/persister-rest": "^5.0.0",
     "babel-loader": "^8.1.0",
     "core-js": "^3.6.5",
-    "cypress": "^4.9.0",
+    "cypress": "^4.11.0",
     "file-loader": "^6.0.0",
     "html-loader": "^1.1.0",
     "react": "^16.13.1",
