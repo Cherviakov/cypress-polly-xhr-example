@@ -1,0 +1,5 @@
+node_modules/
+recordings/
+website/dist/*.js*
+website/cypress/videos/
+website/cypress/screenshots/
