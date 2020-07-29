@@ -5,22 +5,19 @@ sent via xhr (superagent library).
 
 #### Setup
 
-Polly setup take place in app/index.js and instance attached
-to windows object. In Cypress in afterEach test need to add
-following code:
+Polly setup take place in every test in cy.visit call
+onBeforeLoad hook, where new instance of polly created
+and attached to window object. Don't forget to add stop
+call on polly object in afterEach hook.
 
 ```javascript
 afterEach(() => {
-  cy.reload();
   cy.url();
   cy.window().its('polly').invoke('stop');
 });
 ```
 If we not call cy.url() before cy.window() we will get top
 window object from cypress, where polly is not defined.
-If we invoke stop on polly instance and not reload page
-then no further requests will get recorded, as polly instance
-will be detached from all adapters.
 
 #### Recording cy.request
 
@@ -33,7 +30,7 @@ or maybe not happened fast enough), and then use following code:
 ```javascript
 
 cy.url();
-cy.window().its('syperagent').then((superagent) => {
+cy.window().its('superagent').then((superagent) => {
   return superagent
     .get('http://my.url')
     .set('X-HEADER', 'value')
@@ -53,9 +50,17 @@ from saving prior made requests
 
 Requests not get intercepted in cypress commands
 
-Seems all requests saved under same id, could be quite big response
-even on  localhost if you try to save too many requests
-
 Sometimes testing with cy:open showing tests passing offline, but
 running in group after that with cy:e2e make some tests failed 
 saying request aborted (perhaps somehow getting affected by previous tests)
+
+When tried to use fetch adapter on polly and send fetch by following code:
+
+```
+cy.url();
+cy.window().invoke('fetch', 'http://localhost:3000')
+
+getting error from fetch adapter saying first argument must be String or
+Buffer on some internal call, seems related with response header serialization,
+reqeusts happend to be made as server logs it.
+```
