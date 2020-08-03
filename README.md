@@ -19,6 +19,16 @@ afterEach(() => {
 If we not call cy.url() before cy.window() we will get top
 window object from cypress, where polly is not defined.
 
+#### Setup second way
+
+For some reason on working project first way not worked.
+Variation of previously posted solution appear to be working
+with some limitations, namely:
+
+1. Setup Polly in website/app/index.js
+2. Test name set in cypress on cy.visit onBeforeLoad hook
+3. Use cy.reload in afterEach hook after stop polly
+
 #### Recording cy.request
 
 That is not possible as according to cypress docs cy.request
@@ -50,17 +60,32 @@ from saving prior made requests
 
 Requests not get intercepted in cypress commands
 
-Sometimes testing with cy:open showing tests passing offline, but
-running in group after that with cy:e2e make some tests failed 
-saying request aborted (perhaps somehow getting affected by previous tests)
+Recording made during pass individual tests with cy:open may make tests
+not pass when run with cy:e2e, as it seems requests made are not equal.
+
+The bigger recording size bigger cy.wait() value need to use after each
+view loading/sending data (e.g. with recording around 3Mb have to use
+cy.wait(5000))
+
+For unknown reason some of POST and PUT requests not get recorded, therefore
+logic related to update view after such request may not be tested
 
 When tried to use fetch adapter on polly and send fetch by following code:
 
 ```
 cy.url();
 cy.window().invoke('fetch', 'http://localhost:3000')
+```
 
 getting error from fetch adapter saying first argument must be String or
 Buffer on some internal call, seems related with response header serialization,
-reqeusts happend to be made as server logs it.
-```
+requests happened to be made as server logs it.
+https://github.com/Netflix/pollyjs/issues/354
+
+#### My comment
+
+After all this work I believe that cypress and pollyjs should not be used
+together, unless there some very good reason for that. Limitations made with
+use of pollyjs are too hard and additional efforts made to allow tests passing
+only make them run longer and there no assurance that there will be no other
+strange error on the way, either from cypress of from pollyjs.
